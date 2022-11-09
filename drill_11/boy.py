@@ -62,6 +62,10 @@ class RUN:
             self.dir = 1
         elif self.dir <=-2:
             self.dir = -1
+
+        if self.dir == 0:
+            self.add_event(RU)
+
     @staticmethod
     def exit(self, event):
         print('EXIT RUN')
@@ -113,29 +117,30 @@ class AUTO_RUN:
         # 방향을 결정 해야하는데, 어떤키가 눌렸는지에 따라
         # 키 이벤트 정보가 필요
 
-        if self.dir == 0:
-            self.dir = self.face_dir
+        if event == RU:
+            self.dir -= 1
+        elif event == LU:
+            self.dir += 1
+
 
     @staticmethod
     def exit(self, event):
         print('EXIT AUTO_RUN')
-        self.face_dir = self.dir
 
-        self.dir = 0
 
     @staticmethod
     def do(self):
         self.frame = (self.frame + 1) % 8
-        self.x += self.dir
+        self.x += self.face_dir
         self.x = clamp(0, self.x, 800)  # clamp pico2d함수 x를 제한
         if self.x == 0 or self.x == 800:
-            self.dir = self.dir * -1
+            self.face_dir = self.face_dir * -1
 
     @staticmethod
     def draw(self):
-        if self.dir <= -1:
+        if self.face_dir == -1:
             self.image.clip_draw(self.frame*100, 0, 100, 100, self.x, self.y + 25, 200, 200)
-        elif self.dir >= 1:
+        elif self.face_dir == 1:
             self.image.clip_draw(self.frame*100, 100, 100, 100, self.x, self.y + 25, 200, 200)
 
 
@@ -184,7 +189,6 @@ class Boy:
     def handle_events(self, event):
         if (event.type, event.key) in key_event_table:
             key_event = key_event_table[(event.type, event.key)]
-            # self.q.insert(0, key_event)
             self.add_event(key_event)
         # if event.type == SDL_KEYDOWN:
         #     match event.key:
